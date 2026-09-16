@@ -1,36 +1,36 @@
 <template>
   <div id="app">
     <h1>Shift Dashboard</h1>
+
     <button @click="isListVisible = !isListVisible">
       {{ isListVisible ? "Скрыть список" : "Показать список" }}
     </button>
+
     <button @click="clearShifts">Очистить</button>
+
     <p v-if="shifts.length === 0">Смен пока нет</p>
-    <ul v-show="isListVisible">
-      <li v-for="shift in shifts" :key="shift.id">
-        <strong>{{ shift.title }}</strong>
-        <span>{{ shift.date }} {{ shift.start }}-{{ shift.end }}</span>
-        <span
-          :class="{
-            'status-approved': shift.status === 'approved',
-            'status-declined': shift.status === 'declined',
-            'status-pending': shift.status === 'pending',
-          }"
-          >{{ shift.status }}</span
-        >
-        <span>{{ shift.hours * shift.hourlyRate }}$</span>
-      </li>
-    </ul>
+    <div v-show="isListVisible">
+      <ShiftCard
+        v-for="shift in shifts"
+        :key="shift.id"
+        :shift="shift"
+        :show-actions="shift.status === 'pending'"
+        @approve="approveShift"
+        @decline="declineShift"
+      ></ShiftCard>
+    </div>
   </div>
 </template>
 
 <script>
 import shifts from "@/data/mockShifts.js";
+import ShiftCard from "./components/ShiftCard.vue";
 export default {
   name: "App",
+  components: { ShiftCard },
   data() {
     return {
-      shifts: shifts,
+      shifts,
       isListVisible: true,
     };
   },
@@ -38,22 +38,18 @@ export default {
     clearShifts() {
       this.shifts = [];
     },
+    approveShift(id) {
+      this.setStatus(id, "approved");
+    },
+    declineShift(id) {
+      this.setStatus(id, "declined");
+    },
+    setStatus(id, status) {
+      const shift = this.shifts.find((s) => s.id === id);
+      if (shift) {
+        shift.status = status;
+      }
+    },
   },
 };
 </script>
-
-<style>
-.status-approved {
-  color: green;
-  font-weight: bold;
-}
-
-.status-declined {
-  color: red;
-  text-decoration: line-through;
-}
-
-.status-pending {
-  color: orange;
-}
-</style>
