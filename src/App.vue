@@ -5,7 +5,7 @@
       {{ isListVisible ? "Скрыть список" : "Показать список" }}
     </button>
     <button @click="clearShifts">Очистить</button>
-    <p v-if="shifts.lenght === 0">Смен пока нет</p>
+    <p v-if="shifts.length === 0">Смен пока нет</p>
     <ul v-show="isListVisible">
       <li v-for="shift in shifts" :key="shift.id">
         <strong>{{ shift.title }}</strong>
